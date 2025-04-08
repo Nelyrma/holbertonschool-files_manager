@@ -1,35 +1,37 @@
-import { MongoClient } from 'mongodb';
+import mongodb from 'mongodb';
 
 class DBClient {
   constructor() {
     const host = process.env.DB_HOST || 'localhost';
-      const port = process.env.DB_PORT || 27017;
-      const database = process.env.DB_DATABASE || 'files_manager';
+    const port = process.env.DB_PORT || 27017;
+    const database = process.env.DB_DATABASE || 'files_manager';
+    const url = `mongodb://${host}:${port}`;
 
-      const uri = `mongodb://${host}:${port}/${database}`;
-      this.client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-      this.client.connect().catch(err => {
-        console.error('MongoDB connection error:', err);
-      });
-    }
-    
-  async isAlive() {
-    try {
-      await this.client.db().command({ ping: 1 });
-      return true;
-    } catch (error) {
-      return false;
-    }
+    mongodb.MongoClient.connect(url, { useUnifiedTopology: true }, (error, client) => {
+      if (error) {
+        console.error('MongoDB connection error:', error);
+      } else {
+        this.db = client.db(database);
+      }
+    });
+  }
+
+  isAlive() {
+    return !!this.db;
   }
 
   async nbUsers() {
-    const db = this.client.db();
-    return await db.collection('users').countDocuments();
+    if (!this.db) {
+      throw new Error('Database connection is not alive.');
+    }
+    return this.db.collection('users').countDocuments();
   }
 
   async nbFiles() {
-    const db = this.client.db();
-    return await db.collection('files').countDocuments();
+    if (!this.db) {
+      throw new Error('Database connection is not alive.');
+    }
+    return this.db.collection('files').countDocuments();
   }
 }
 
