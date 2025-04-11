@@ -10,7 +10,7 @@ class AppController {
     res.status(200).send(status);
   }
 
-  static getStatus(req, res) {
+  static async getStatus(req, res) {
     const stats = {
       users: await dbClient.nbUsers(),
       files: await dbClient.nbFiles(),
