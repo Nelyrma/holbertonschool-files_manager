@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
-import crypto from 'crypto';
 
 class AuthController {
   static async getConnect(req, res) {
@@ -30,7 +30,7 @@ class AuthController {
 
     await redisClient.set(key, user._id.toString(), 86400);
 
-    res.status(200).send({ token });
+    return res.status(200).send({ token });
   }
 
   static async getDisconnect(req, res) {
@@ -49,7 +49,7 @@ class AuthController {
 
     await redisClient.del(key);
 
-    res.status(204).send();
+    return res.status(204).send();
   }
 }
 
