@@ -36,16 +36,13 @@ class UsersController {
       return res.status(401).send({ error: 'Unauthorized' });
     }
 
-    const user = await dbClient.db.collection('users').findOne(
-      { _id: dbClient.ObjectId(userId) },
-      { projection: { email: 1 } }
-    );
+    const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
 
     if (!user) {
       return res.status(401).send({ error: 'Unauthorized' });
     }
 
-    res.status(200).send({ id: userId, email: user.email });
+    return res.status(200).send({ id: userId, email: user.email });
   }
 }
 
